@@ -1,0 +1,20 @@
+Utenti:
+
+Gli utenti si registrano con un'email e una password.
+Ogni utente può avere un nome e altre informazioni.
+Ogni utente può effettuare acquisti.
+Prodotti:
+
+I prodotti in magazzino hanno un nome, un prezzo e una quantità disponibile.
+Ogni prodotto può avere ulteriori dettagli come descrizione o immagini.
+Ogni prodotto può essere acquistato e può essere soggetto a rifornimenti.
+Acquisti:
+
+Gli utenti possono acquistare prodotti.
+Gli acquisti includono la quantità, il prezzo totale e la data dell'acquisto.
+Ogni acquisto è collegato a un utente e a un prodotto.
+Rifornimenti:
+
+I prodotti in magazzino possono ricevere rifornimenti per aumentare la quantità disponibile.
+I rifornimenti includono la quantità e la data del rifornimento.
+Ogni rifornimento è collegato a un prodotto.

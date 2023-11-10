@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model customer {
+  id       Int        @id @default(autoincrement())
+  email    String     @unique
+  
+  password String
+  name     String
+  purchase purchase[]
+}
+
+model product {
+  id        Int        @id @default(autoincrement())
+  name      String
+  price     Float
+  info      String
+  imagePath String
+  quantity  Int
+  purchase  purchase[]
+  supply    supply[]
+}
+
+model purchase {
+  id           Int      @id @default(autoincrement())
+  quantity     Int
+  totalPrice   Float
+  purchaseDate DateTime @default(now())
+  customerId   Int
+  productId    Int
+  customer     customer @relation(fields: [customerId], references: [id], map: "Purchase_customerId_fkey")
+  product      product  @relation(fields: [productId], references: [id], map: "Purchase_productId_fkey")
+
+  @@index([customerId], map: "Purchase_customerId_fkey")
+  @@index([productId], map: "Purchase_productId_fkey")
+}
+
+model supply {
+  id         Int      @id @default(autoincrement())
+  quantity   Int
+  supplyDate DateTime @default(now())
+  productId  Int
+  product    product  @relation(fields: [productId], references: [id], map: "Supply_productId_fkey")
+
+  @@index([productId], map: "Supply_productId_fkey")
+}

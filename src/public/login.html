@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #509ad6;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+    }
+
+    h1 {
+        text-align: center;
+        margin-top: 20px;
+        color: #333;
+    }
+
+    form {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 20px;
+        width: 300px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+    }
+
+    .group {
+        margin: 10px 0;
+    }
+
+    label {
+        display: block;
+        font-weight: bold;
+    }
+
+    input {
+        width: 93%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+       
+        font-size: 16px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+        
+    }
+    input[type="submit"] {
+  margin-left: 10px; /* Imposta il margine sinistro desiderato */
+  margin-top: 10px;
+}
+
+    button:hover {
+        background: #0056b3;
+    }
+   </style>
+</head>
+<body>
+    <h1>Customer Login</h1>
+    <form id="form-login">
+        <label for="email">Email</label>
+        <input type="text" name="email" id="email"><br>
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password">
+        <input type="submit" value="Login">
+    </form>
+
+    <script>
+      document.querySelector('#form-login').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const email = formData.get('email');
+    const password = formData.get('password');
+    console.log('Dati del modulo:', email, password);
+
+    try {
+        const loginResponse = await fetch('/customers/login', {
+            method: 'post',
+            body: JSON.stringify({ email, password }), // Assicurati che sia 'password', non 'Password'
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        // Gestisci la risposta qui, ad esempio:
+        if (loginResponse.ok) {
+            // Login riuscito
+            console.log('Accesso effettuato con successo');
+            window.location.href = 'http://localhost:4000/products.html';
+        } else {
+            // Gestisci un errore di login
+            console.error('Errore durante il login:', loginResponse.statusText);
+        }
+    } catch (error) {
+        console.error('Errore durante la richiesta di login:', error);
+    }
+});
+
+        
+    </script>
+</body>
+</html>

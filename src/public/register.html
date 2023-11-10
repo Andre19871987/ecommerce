@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>register</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #509ad6;
+      }
+
+      h1 {
+        text-align: center;
+    margin: 50px;
+        color: #333;
+      }
+
+      form {
+        max-width: 400px;
+        margin: auto;
+        margin-top: 300px;
+        
+        padding: 20px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+     
+      }
+
+      .group {
+        margin-bottom: 10px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+      
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+      }
+
+      button {
+        
+        display: block;
+        width: 100%;
+        padding: 10px;
+        background-color: #0074d9;
+        color: #fff;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+      }
+
+      #result {
+        margin-top: 10px;
+        display: none;
+        padding: 10px;
+        border-radius: 3px;
+      }
+
+      #result-success {
+        background-color: #4caf50;
+      }
+
+      #result-error {
+        background-color: #f44336;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Customer Register</h1>
+    <form
+      id="sample-form"
+      method="POST"
+      action="http://localhost:4000/customers/register"
+    >
+      <div class="group">
+        <label for="name">Nome:</label>
+        <input type="text" name="name" id="nome" /><br />
+      </div>
+      <div class class="group">
+        <label for="email">email:</label>
+        <input type="text" name="email" id="email" required /><br />
+      </div>
+      <div class="group">
+        <label for="password">password:</label>
+        <input type="text" name="password" id="password" required /><br />
+      </div>
+      <button type="submit">registrati</button>
+      <div id="result">
+        <div id="result-success">Registrazione avvenuta con successo</div>
+        <div id="result-error">Registrazione non avvenuta per un errore</div>
+      </div>
+    </form>
+
+    <script>
+      document
+        .getElementById("sample-form")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const formData = new FormData(event.target);
+          const name = formData.get("name");
+          const email = formData.get("email");
+          const password = formData.get("password");
+
+          const resultSuccess = document.getElementById("result-success");
+          const resultError = document.getElementById("result-error");
+          try {
+            const result = await fetch(
+              "http://localhost:4000/customers/register",
+              {
+                method: "post",
+                body: JSON.stringify({
+                  name: name,
+                  email: email,
+                  password: password,
+                }),
+                headers: { "Content-Type": "application/json" },
+              }
+            );
+
+            if (result.status === 201) {
+              resultSuccess.style.display = "block";
+              resultError.style.display = "none";
+              window.location.href = "http://localhost:4000/customers/login";
+            } else {
+              throw new Error(`Server returned status ${result.status}`);
+            }
+          } catch (error) {
+            console.error(error);
+            resultError.style.display = "block"; // Fix: Correct the typo here
+            resultSuccess.style.display = "none";
+          }
+          setTimeout(() => {
+            resultSuccess.style.display = "none";
+            resultError.style.display = "none";
+          }, 2000);
+        });
+    </script>
+  </body>
+</html>

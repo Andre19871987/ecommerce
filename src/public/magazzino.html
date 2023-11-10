@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Magazzino</title>
+    <style>
+     body {
+      font-family: Arial, sans-serif;
+     
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    /* Stili CSS per il blocco dei prodotti */
+    #products-container {
+  display: flex; /* Raggruppa i prodotti in una singola riga */
+  flex-wrap: wrap; /* Fa in modo che i prodotti vadano a capo quando non c'è spazio */
+  justify-content: 100%; /* Allinea i prodotti al centro*/
+
+}
+    
+
+    .product {
+      width: 200px;
+     
+      border: 1px solid #ddd;
+      margin: 5px;
+      margin-left: 10px;
+      padding: 10px;
+      text-align: center;
+      
+    }
+
+    .product h2 {
+      font-size: 18px;
+      margin: 5px 0;
+    }
+
+    .product p {
+      margin: 5px 0;
+    }
+
+    .product img {
+     width: 130px;
+    height: 100px;
+      
+    }
+
+    .product input[type="number"] {
+      width: 50px;
+      text-align: center;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>Magazzino</h1>
+
+    <div id="products-container">
+      <!-- Qui verranno visualizzati i dati dei prodotti dal database -->
+    </div>
+
+    <script>
+          // Utilizza JavaScript per recuperare i dati dei prodotti e visualizzarli
+          async function fetchProducts() {
+            try {
+              const response = await fetch('/products');
+              const products = await response.json();
+
+              const productsContainer = document.getElementById('products-container');
+              productsContainer.innerHTML = '';
+
+              products.forEach(product => {
+                const productElement = document.createElement('div');
+                productElement.classList.add('product');
+                productElement.innerHTML = `
+                  <h2>${product.name}</h2>
+                  <p>Prezzo: €${product.price}</p>
+                  <p>${product.info}</p>
+                  <img src="${product.imagePath}" alt="${product.name}" width="100">
+                  <label for="quantity-${product.id}">Quantità:</label>
+                  <input type="number" id="quantity-${product.id}" min="0" max="100" value="${product.quantity}">
+                 <button onclick="updateQuantity(${product.id})">Aggiorna</button>
+                 `;
+                 productsContainer.appendChild(productElement);
+              });
+            } catch (error) {
+              console.error('Errore nel recupero dei prodotti:', error);
+           
+          
+
+            };
+    }
+
+          function updateQuantity(productId) {
+        const newQuantity = parseInt(document.getElementById(`quantity-${productId}`).value);
+
+        fetch(`/products/${productId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ quantity: newQuantity }),
+        })
+          .then((response) => {
+            if (response.status === 200) {
+              // Se desideri aggiornare l'elemento direttamente, puoi farlo qui
+              document.getElementById(`quantity-${productId}`).textContent = newQuantity;
+              alert('Quantità aggiornata con successo.');
+            } else {
+              alert('Errore durante l\'aggiornamento della quantità.');
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+
+          // Esegui la funzione per recuperare i dati dei prodotti quando la pagina si carica
+             fetchProducts();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Negozio di Prodotti</title>
+  <style>
+    /* Stili CSS per la formattazione generale */
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    /* Stili CSS per il blocco dei prodotti */
+    #products-container {
+      display: flex; /* Raggruppa i prodotti in una singola riga */
+  flex-wrap: wrap; /* Fa in modo che i prodotti vadano a capo quando non c'è spazio */
+  justify-content: 100%; /* Allinea i prodotti al centro*/
+
+    }
+
+    .product {
+      width: 200px;
+      border: 1px solid #ddd;
+      margin: 5px;
+      margin-left: 10px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .product h2 {
+      font-size: 18px;
+      margin: 5px 0;
+    }
+
+    .product p {
+      margin: 5px 0;
+    }
+
+    .product img {
+      width: 130px;
+      height: 100px;
+    }
+
+    .product input[type="number"] {
+      width: 50px;
+      text-align: center;
+    }
+
+    /* Stili CSS per il carrello modale */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-content {
+      position: relative;
+      background-color: #f9f9f9;
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 60%;
+    }
+
+    /* Pulsante per chiudere il carrello modale */
+    .close-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #d9534f;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Benvenuti nel nostro negozio</h1>
+
+  <div id="products-container">
+    <!-- Qui verranno visualizzati i dati dei prodotti dal database -->
+  </div>
+
+  <button id="show-cart-button">Il mio Carrello</button>
+
+  <!-- Finestra modale del carrello -->
+  <div id="cart-modal" class="modal">
+    <div class="modal-content">
+      <h2>Il tuo Carrello</h2>
+      <button id="close-cart-button" class="close-button">Chiudi</button> <!-- Pulsante per chiudere il carrello -->
+      <ul id="cart">
+        <!-- Il carrello è inizialmente vuoto -->
+      </ul>
+      <p>Totale: €<span id="cart-total">0.00</span></p>
+    </div>
+  </div>
+
+  <script>
+    // Funzione per mostrare il carrello modale
+    function showCartModal() {
+      const modal = document.getElementById('cart-modal');
+      modal.style.display = 'block';
+    }
+
+    // Funzione per chiudere il carrello modale
+    function closeCartModal() {
+      const modal = document.getElementById('cart-modal');
+      modal.style.display = 'none';
+    }
+
+    // Aggiungi un gestore di eventi al pulsante "Il mio Carrello"
+    const showCartButton = document.getElementById('show-cart-button');
+    showCartButton.addEventListener('click', showCartModal);
+
+    // Aggiungi un gestore di eventi al pulsante "Chiudi"
+    const closeCartButton = document.getElementById('close-cart-button');
+    closeCartButton.addEventListener('click', closeCartModal);
+
+
+    // ... Il resto del tuo codice JavaScript
+    const cart = []; // Array per memorizzare i prodotti nel carrello
+    let cartTotal = 0; // Totale del carrello
+
+    // Funzione per aggiungere un prodotto al carrello
+    function addToCart(product) {
+      const existingProduct = cart.find(item => item.name === product.name);
+
+      if (existingProduct) {
+        // Se il prodotto esiste già nel carrello, aggiorna la quantità e il prezzo
+        existingProduct.quantity += product.quantity;
+        existingProduct.price += product.price * product.quantity;
+      } else {
+        // Se il prodotto non esiste nel carrello, aggiungilo
+        cart.push(product);
+      }
+
+      cartTotal += product.price * product.quantity;
+
+      // Aggiorna la visualizzazione del carrello
+      updateCartDisplay();
+    }
+
+    function updateCartDisplay() {
+      const cartItems = document.getElementById('cart');
+      const cartTotalDisplay = document.getElementById('cart-total');
+      cartItems.innerHTML = '';
+
+      cart.forEach(product => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${product.name} x${product.quantity} - Prezzo: €${product.price.toFixed(2)}`;
+        cartItems.appendChild(listItem);
+      });
+
+      cartTotalDisplay.textContent = cartTotal.toFixed(2);
+    }
+
+    // Funzione per simulare il recupero dei dati dei prodotti dal server o database (da sostituire con la tua logica)
+    async function fetchProducts() {
+      try {
+        const response = await fetch('/products');
+        const products = await response.json();
+
+        const productsContainer = document.getElementById('products-container');
+        productsContainer.innerHTML = '';
+
+        products.forEach(product => {
+          product.quantity = 0; // Inizializza la quantità a 0
+          const productElement = document.createElement('div');
+          productElement.classList.add('product');
+          productElement.innerHTML = `
+            <h2>${product.name}</h2>
+            <p>Prezzo: €${product.price}</p>
+            <p>${product.info}</p>
+            <img src="${product.imagePath}" alt="${product.name}" width="100">
+            <label for="quantity-${product.id}">Quantità:</label>
+            <input type="number" id="quantity-${product.id}" min="0" max="1000" value="0">
+            <button class="add-to-cart-button" data-product-id="${product.id}" data-product-name="${product.name}" data-product-price="${product.price}">Aggiungi al carrello</button>
+          `;
+          productsContainer.appendChild(productElement);
+
+          // Aggiungi un gestore di eventi al pulsante "Aggiungi al carrello"
+          const addToCartButton = productElement.querySelector('.add-to-cart-button');
+          addToCartButton.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+            const productName = this.getAttribute('data-product-name');
+            const productPrice = parseFloat(this.getAttribute('data-product-price'));
+            const quantityInput = document.getElementById(`quantity-${productId}`);
+            const quantity = parseInt(quantityInput.value, 10);
+
+            // Aggiorna la quantità nel prodotto
+            product.quantity = quantity;
+
+            if (quantity > 0) {
+              addToCart({ name: productName, price: productPrice, quantity: quantity });
+            }
+          });
+        });
+      } catch (error) {
+        console.error('Errore nel recupero dei prodotti:', error);
+      }
+    }
+
+    // Esegui la funzione per recuperare i dati dei prodotti quando la pagina si carica
+    window.addEventListener('load', fetchProducts);
+  </script>
+</body>
+</html>
